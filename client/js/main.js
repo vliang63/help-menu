@@ -2,13 +2,31 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var userInputData = {};
+var NewScreen = React.createClass({
+	getInitialState: function() {
+		return {
+			data:this.props.data[this.props.level],
+			level: this.props.level
+		}
+	},
+	componentDidMount: function() {
+	},
+	render: function() {
+		return (
+			<div className="homeScreen">
+				<h1>Topics</h1>
+				<TopicRows data={this.state.data}/>
+			</div>
+		)
+	}
+});
 
 var HomeScreen = React.createClass({
 	getInitialState: function(){
 		return {
-			data:{},
-			id:0
+			data:{0:{}},
+			id:0,
+			level:0
 		};
 	},
 	componentDidMount: function() {
@@ -17,20 +35,21 @@ var HomeScreen = React.createClass({
 			e.preventDefault();
 			var addTopicInput = document.getElementById("addTopicInput");
 			var newTopic = addTopicInput.value;
-			console.log(newTopic)
-			saveThis.state.data[newTopic] = {"id":saveThis.state.id};
+			var level = saveThis.state.level;
+			var data = saveThis.state.data;
+			data[level][newTopic] = {"id":saveThis.state.id};
 			saveThis.state.id += 1;
-			console.log(saveThis.state.id)
-			saveThis.setState({data:saveThis.state.data, id:saveThis.state.id});
+			saveThis.setState({data:data, id:saveThis.state.id});
 			addTopicInput.value = '';
+			console.log('data')
+			console.log(data)
 		})
+		// listen for click on a topic or the back button
+		// render a new screen with the right level of data
 	},
 	render: function() {
 		return (
-			<div className="homeScreen">
-				<h1>Topics</h1>
-				<TopicRows data={this.state.data}/>
-			</div>
+			<NewScreen data={this.state.data} level={this.state.level}/>
 		)
 	}
 });
