@@ -1,4 +1,5 @@
 // main.js
+// add submit handler listener for form element
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -29,27 +30,26 @@ var HomeScreen = React.createClass({
 			level:0
 		};
 	},
+	handleTopicSubmit: function(newTopic){
+		var level = this.state.level;
+		var data = this.state.data;
+		var id = this.state.id;
+		data[level][newTopic] = {"id":this.state.id};
+		id += 1;
+		console.log('data')
+		console.log(data)
+		this.setState({data:data, id:id})
+	},
 	componentDidMount: function() {
-		var saveThis = this;
-		document.addEventListener("submit", function(e){
-			e.preventDefault();
-			var addTopicInput = document.getElementById("addTopicInput");
-			var newTopic = addTopicInput.value;
-			var level = saveThis.state.level;
-			var data = saveThis.state.data;
-			data[level][newTopic] = {"id":saveThis.state.id};
-			saveThis.state.id += 1;
-			saveThis.setState({data:data, id:saveThis.state.id});
-			addTopicInput.value = '';
-			console.log('data')
-			console.log(data)
-		})
 		// listen for click on a topic or the back button
 		// render a new screen with the right level of data
 	},
 	render: function() {
 		return (
-			<NewScreen data={this.state.data} level={this.state.level}/>
+			<div className="homeScreen">
+				<NewScreen data={this.state.data} level={this.state.level} />
+				<AddTopicForm level={this.state.level} onTopicSubmit={this.handleTopicSubmit} />
+			</div>
 		)
 	}
 });
@@ -79,16 +79,26 @@ var AddTopicBtn = React.createClass({
 	}
 });
 
-var AddTopicInput = React.createClass({
+var AddTopicForm = React.createClass({
+	getInitialState: function() {
+		return {topic:''};
+	},
+	handleSubmit: function(e){
+		e.preventDefault(e);
+		var newTopic = this.state.topic;
+		this.props.onTopicSubmit(newTopic);
+		this.setState({topic:''})
+	},
+	handleTopicChange: function(e) {
+		this.setState({topic:e.target.value})
+	},
 	render: function() {
 		return(
-			<div>
+			<form className="addTopicForm" onSubmit={this.handleSubmit}>
 				<label>Add Topic Input</label>
-				<form>
-					<input id="addTopicInput" />
-					<button type="submit">submit</button>
-				</form>
-			</div>
+				<input id="addTopicInput" value={this.state.topic} onChange={this.handleTopicChange}/>
+				<button type="submit">submit</button>
+			</form>
 		)	
 	}
 });
@@ -102,9 +112,4 @@ var TopicRow = React.createClass({
 ReactDOM.render(
   	<HomeScreen />,
   	document.getElementById('content')
-);
-
-ReactDOM.render(
-  	<AddTopicInput />,
-  	document.getElementById('addTopicInputBox')
 );
