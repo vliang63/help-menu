@@ -1,22 +1,22 @@
 // main.js
-// add submit handler listener for form element
+// add click handler for going down a level
+// add back button for going up a level
 var React = require('react');
 var ReactDOM = require('react-dom');
 
 var NewScreen = React.createClass({
-	getInitialState: function() {
-		return {
-			data:this.props.data[this.props.level],
-			level: this.props.level
-		}
+	handleClick: function(e){
+		this.props.handleNewScreenClick(e);
 	},
-	componentDidMount: function() {
+	componentWillMount: function() {
 	},
 	render: function() {
+		console.log('newscreenrender')
+		console.log(this.props.data)
 		return (
-			<div className="homeScreen">
+			<div className="newScreen" onClick={this.handleClick}>
 				<h1>Topics</h1>
-				<TopicRows data={this.state.data}/>
+				<TopicRows data={this.props.data}/>
 			</div>
 		)
 	}
@@ -27,27 +27,51 @@ var HomeScreen = React.createClass({
 		return {
 			data:{0:{}},
 			id:0,
-			level:0
+			level:0,
+			topic:""
 		};
 	},
 	handleTopicSubmit: function(newTopic){
 		var level = this.state.level;
 		var data = this.state.data;
 		var id = this.state.id;
-		data[level][newTopic] = {"id":this.state.id};
+		var topic = this.state.topic;
+		if(data[level][topic]) {
+			data[level][topic][newTopic] = {"id":this.state.id};
+		}else{
+			data[level][newTopic] = {"id":this.state.id};
+		}
+		if (!data[level + 1]){data[level + 1] = {}}
+		data[level + 1][newTopic] = {};
 		id += 1;
 		console.log('data')
 		console.log(data)
 		this.setState({data:data, id:id})
 	},
+	handleNewScreenClick: function(e) {
+		// render a new screen with the right level of data
+		var selectionValue = document.getElementById(e.target.id).innerHTML;
+		var level = this.state.level;
+		level += 1;
+		console.log('selectionValue')
+		console.log(selectionValue)
+		this.setState({
+			level: level,
+			topic: selectionValue
+		});
+	},
 	componentDidMount: function() {
 		// listen for click on a topic or the back button
-		// render a new screen with the right level of data
+		
 	},
 	render: function() {
+		var level = this.state.level;
+		var data = this.state.data;
+		var topic = this.state.topic;
+		var dataToRender = level > 0 ? data[level][topic] : data[level];
 		return (
 			<div className="homeScreen">
-				<NewScreen data={this.state.data} level={this.state.level} />
+				<NewScreen key="1" handleNewScreenClick={this.handleNewScreenClick} data={dataToRender} />
 				<AddTopicForm level={this.state.level} onTopicSubmit={this.handleTopicSubmit} />
 			</div>
 		)
@@ -89,14 +113,14 @@ var AddTopicForm = React.createClass({
 		this.props.onTopicSubmit(newTopic);
 		this.setState({topic:''})
 	},
-	handleTopicChange: function(e) {
+	handleAddTopicChange: function(e) {
 		this.setState({topic:e.target.value})
 	},
 	render: function() {
 		return(
 			<form className="addTopicForm" onSubmit={this.handleSubmit}>
 				<label>Add Topic Input</label>
-				<input id="addTopicInput" value={this.state.topic} onChange={this.handleTopicChange}/>
+				<input id="addTopicInput" value={this.state.topic} onChange={this.handleAddTopicChange}/>
 				<button type="submit">submit</button>
 			</form>
 		)	
@@ -105,7 +129,7 @@ var AddTopicForm = React.createClass({
 
 var TopicRow = React.createClass({
 	render: function(){
-		return <h2 className="topicRow">{this.props.topic}</h2>
+		return <h2 className="topicRow" id={this.props.topic}>{this.props.topic}</h2>
 	}
 });
 
