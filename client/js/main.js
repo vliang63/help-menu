@@ -2,28 +2,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-// var data = {
-// 	"Doctor":{
-// 		"id":1,
-// 		"Insurance":{
-// 			"__end":"covered by your insurance provider"
-// 		},"Network":{
-// 		},"Costs":{
-// 		}
-// 	},"Dentist":{
-// 		"id":2,
-// 		"Insurance":{
-// 		},
-// 		"Network":{
-// 		},
-// 		"Costs":{
-// 		}
-// 	}, "Physical Therapy":{
-// 		"id":3,
-// 		"__end":"not covered by any provider"
-// 	}
-// }
-
 var userInputData = {};
 
 var HomeScreen = React.createClass({
@@ -35,22 +13,16 @@ var HomeScreen = React.createClass({
 	},
 	componentDidMount: function() {
 		var saveThis = this;
-		console.log('save this')
-		console.log(this)
-		document.getElementById("addTopicBtn").addEventListener("click",function(){
-			ReactDOM.render(
-				<AddTopicInput />,
-				document.getElementById("addTopicInputBox")
-			);
-		});
 		document.addEventListener("submit", function(e){
 			e.preventDefault();
-			var newTopic = document.getElementById("addTopicInput").value;
+			var addTopicInput = document.getElementById("addTopicInput");
+			var newTopic = addTopicInput.value;
 			console.log(newTopic)
 			saveThis.state.data[newTopic] = {"id":saveThis.state.id};
 			saveThis.state.id += 1;
 			console.log(saveThis.state.id)
 			saveThis.setState({data:saveThis.state.data, id:saveThis.state.id});
+			addTopicInput.value = '';
 		})
 	},
 	render: function() {
@@ -114,6 +86,6 @@ ReactDOM.render(
 );
 
 ReactDOM.render(
-  	<AddTopicBtn />,
-  	document.getElementById('addTopicBtn')
+  	<AddTopicInput />,
+  	document.getElementById('addTopicInputBox')
 );
