@@ -28,14 +28,14 @@ var HomeScreen = React.createClass({
 			data:{0:{}},
 			id:0,
 			level:0,
-			topic:""
+			topicStack:[""]
 		};
 	},
 	handleTopicSubmit: function(newTopic){
 		var level = this.state.level;
 		var data = this.state.data;
 		var id = this.state.id;
-		var topic = this.state.topic;
+		var topic = this.state.topicStack[0];
 		if(data[level][topic]) {
 			data[level][topic][newTopic] = {"id":this.state.id};
 		}else{
@@ -55,26 +55,48 @@ var HomeScreen = React.createClass({
 		level += 1;
 		console.log('selectionValue')
 		console.log(selectionValue)
+		this.state.topicStack.unshift(selectionValue)
+		console.log(this.state.topicStack)
 		this.setState({
 			level: level,
-			topic: selectionValue
+			topicStack: this.state.topicStack
 		});
 	},
-	componentDidMount: function() {
-		// listen for click on a topic or the back button
-		
+	// listen for click on a topic or the back button
+	handleBackButtonClick: function() {
+		var level = this.state.level;
+		level -= 1;
+		this.setState({
+			level:level,
+			topicStack: this.state.topicStack.slice(1)
+		})
 	},
 	render: function() {
 		var level = this.state.level;
 		var data = this.state.data;
-		var topic = this.state.topic;
+		var topic = this.state.topicStack[0];
+		console.log('topic')
+		console.log(topic)
 		var dataToRender = level > 0 ? data[level][topic] : data[level];
 		return (
 			<div className="homeScreen">
+				<BackButton handleBackButtonClick={this.handleBackButtonClick} />
 				<NewScreen key="1" handleNewScreenClick={this.handleNewScreenClick} data={dataToRender} />
 				<AddTopicForm level={this.state.level} onTopicSubmit={this.handleTopicSubmit} />
 			</div>
 		)
+	}
+});
+
+var BackButton = React.createClass({
+	handleClick: function() {
+		this.props.handleBackButtonClick();
+	},
+	render: function() {
+		return (
+			<button onClick={this.handleClick}>Back</button>
+		)
+		
 	}
 });
 
